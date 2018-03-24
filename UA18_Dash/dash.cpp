@@ -127,7 +127,7 @@ void Dash::setTach(uint16_t rpm){
         if(i >= TACH_START + TACH_LENGTH){
             break;
         }
-        strip.setPixelColor(i, tachColor[i]);
+        strip.setPixelColor(i, tachColor[i - TACH_START]);
     }
 }
 

@@ -9,9 +9,9 @@
 
 #define COOLANT_TEMP_LIGHT  77
 #define OIL_TEMP_LIGHT      78
-#define TACH_START          0
+#define TACH_START          64
 #define TACH_LENGTH         12
-#define GEAR_START          12
+#define GEAR_START          0
 #define GEAR_LENGTH         64
 
 #define MAX_RPM     12000
