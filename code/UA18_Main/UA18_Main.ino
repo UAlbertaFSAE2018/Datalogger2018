@@ -1,3 +1,4 @@
+#include <CAN.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -32,6 +33,14 @@ void setup() {
         while(1);
     }
     bno.setExtCrystalUse(true);
+    // TODO: make code tolerant to missing CAN
+    if (!CAN.begin(1000E3)) {
+          if(DEBUG_MODE) {
+              Serial.println("Starting CAN failed!");
+          }
+          while (1);
+    }
+    CAN.onReceive(updateCAN);
     if(DEBUG_MODE){
         dash.test();
     }
@@ -86,8 +95,15 @@ void updateOrientation() {
 }
 
 
-void updateCAN() {
-    
+void updateCAN(int packetSize) {
+    if(CAN.packetRtr()){
+        return;
+    }
+    int packetID = CAN.packetId();
+    int packet[packetSize];
+    for(int i = 0; i < packetSize; i++){
+        packet[i] = CAN.read();
+    }
 }
 
 
