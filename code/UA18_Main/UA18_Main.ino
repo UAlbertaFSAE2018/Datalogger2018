@@ -1,12 +1,13 @@
 #include <Wire.h>
-#include <Adafruit_GPS.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
+#include <TinyGPS++.h>
 #include "dash.h"
 #include "sensorShield.h"
 
 #define DEBUG_MODE  true
+#define BAUD_RATE   9600
 #define NUM_SENSORS 32
 #define NUM_VALUES  40
 #define DASH_PIN    6
@@ -14,25 +15,25 @@
 SensorShield sensorShield = SensorShield();
 Dash dash = Dash(DASH_PIN);
 Adafruit_BNO055 bno = Adafruit_BNO055();
-if(!DEBUG_MODE){
-    Adafruit_GPS GPS(&Serial);
-}
+TinyGPSPlus gps;
 
 
 uint32_t values[NUM_VALUES] = {};
 
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(BAUD_RATE);
     dash.begin();
+    // TODO: make code tolerant to missing sensor
     if(!bno.begin()) {
-        Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+        if(DEBUG_MODE) {
+            Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+        }
         while(1);
     }
+    bno.setExtCrystalUse(true);
     if(DEBUG_MODE){
         dash.test();
-    } else {
-        GPS.begin(9600);
     }
     dash.clear();
 }
@@ -66,26 +67,22 @@ void updateSensors() {
 
 
 void updateGPS() {
-    GPS.read();
-    if (GPS.newNMEAreceived()) {
-        // TODO: update date/time
-        // TODO: simplify date/time
-        values[NUM_SENSORS] = GPS.year;
-        values[NUM_SENSORS + 1] = GPS.month;
-        values[NUM_SENSORS + 2] = GPS.day;
-        values[NUM_SENSORS + 3] = GPS.hour;
-        values[NUM_SENSORS + 4] = GPS.minute;
-        values[NUM_SENSORS + 5] = GPS.seconds;
-        values[NUM_SENSORS + 6] = GPS.milliseconds;
-
-        values[NUM_SENSORS + 7] = GPS.latitude;
-        values[NUM_SENSORS + 8] = GPS.longitude;
+    while(Serial.available()){
+        gps.encode(Serial.read());
     }
+    values[NUM_SENSORS] = gps.location.rawLat().billionths;
+    values[NUM_SENSORS + 1] = gps.location.rawLng().billionths;
+    values[NUM_SENSORS + 2] = gps.date.value();
+    values[NUM_SENSORS + 3] = gps.time.value();
 }
 
 
 void updateOrientation() {
-    
+    imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    values[NUM_SENSORS + 4] = bno.getTemp();
+    values[NUM_SENSORS + 5] = accel.x();
+    values[NUM_SENSORS + 6] = accel.y();
+    values[NUM_SENSORS + 7] = accel.z();
 }
 
 
