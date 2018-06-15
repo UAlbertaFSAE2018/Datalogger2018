@@ -10,6 +10,7 @@
 #define DEBUG_MODE  true
 #define BAUD_RATE   9600
 #define NUM_SENSORS 32
+#define NUM_CAN_IDS 23
 #define NUM_VALUES  40
 #define DASH_PIN    6
 
@@ -19,7 +20,14 @@ Adafruit_BNO055 bno = Adafruit_BNO055();
 TinyGPSPlus gps;
 
 
+// see Haltech_CAN_Broadcast_Protocol_v2-0.pdf
+// TODO: reduce this set to just teh IDs we use
+uint16_t can_IDs[NUM_CAN_IDS] = {0x360, 0x361, 0x362, 0x363, 0x368, 0x369, 0x36A, 0x36B, 0x36C, 0x36D,
+        0x36E, 0x36F, 0x370, 0x371, 0x372, 0x373, 0x374, 0x375, 0x3E0, 0x3E1, 0x3E2, 0x3E3, 0x3E4};
 uint32_t values[NUM_VALUES] = {};
+
+int8_t gear = -1;
+uint16_t rpm = 0;
 
 
 void setup() {
@@ -51,7 +59,6 @@ void setup() {
 void loop() {
     updateSensors();
     updateOrientation();
-    updateCAN();
     if(!DEBUG_MODE){
         updateGPS();
     }
