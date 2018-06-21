@@ -9,6 +9,7 @@
 
 #define DEBUG_MODE  true
 #define BAUD_RATE   9600
+#define CAN_RATE    1000E3
 #define NUM_SENSORS 32
 #define NUM_CAN_IDS 23
 #define NUM_VALUES  40
@@ -42,7 +43,7 @@ void setup() {
     }
     bno.setExtCrystalUse(true);
     // TODO: make code tolerant to missing CAN
-    if (!CAN.begin(1000E3)) {
+    if (!CAN.begin(CAN_RATE)) {
           if(DEBUG_MODE) {
               Serial.println("Starting CAN failed!");
           }
@@ -53,6 +54,7 @@ void setup() {
         dash.test();
     }
     dash.clear();
+    dash.show();
 }
 
 
@@ -116,6 +118,7 @@ void updateCAN(int packetSize) {
 
 void updateDash() {
     // TODO: add real values and temp warning lights
+    dash.clear();
     dash.setGear(0);
     dash.setTach(2000);
     dash.show();
