@@ -62,7 +62,7 @@ static const bool gearNumbers[6][64] = {{
 Dash::Dash(uint8_t pin){
     strip = Adafruit_NeoPixel(NUM_PIXELS, pin, NEO_RGB + NEO_KHZ800);
     
-    gearColor = strip.Color(LED_OFF, LED_ON, LED_OFF);
+    gearColor = strip.Color(LED_ON, LED_OFF, LED_OFF); // gear color is actually in GRB
     tempColor = strip.Color(LED_ON, LED_OFF, LED_OFF);
     
     tachColor[0] = strip.Color(LED_OFF, LED_ON, LED_OFF);
