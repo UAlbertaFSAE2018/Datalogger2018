@@ -123,11 +123,11 @@ void Dash::clearTempLight(uint8_t light){
 
 void Dash::setTach(uint16_t rpm){
     clearTach();
-    for(uint8_t i = TACH_START + TACH_LENGTH - 1; i - (TACH_START + TACH_LENGTH - 1) > rpm / (MAX_RPM / (TACH_LENGTH + 1)); i--){
-        if(i == TACH_START - 1){
+    for(uint8_t i = 0; i < rpm / (MAX_RPM / (TACH_LENGTH + 1)); i++){
+        if(i >= TACH_LENGTH){
             break;
         }
-        strip.setPixelColor(i, tachColor[i - TACH_START]);
+        strip.setPixelColor(TACH_START + TACH_LENGTH - 1 - i, tachColor[i]);
     }
 }
 
