@@ -60,7 +60,7 @@ static const bool gearNumbers[6][64] = {{
 };
 
 Dash::Dash(uint8_t pin){
-    strip = Adafruit_NeoPixel(NUM_PIXELS, pin, NEO_GRB + NEO_KHZ800);
+    strip = Adafruit_NeoPixel(NUM_PIXELS, pin, NEO_RGB + NEO_KHZ800);
     
     gearColor = strip.Color(LED_OFF, LED_OFF, LED_ON);
     tempColor = strip.Color(LED_ON, LED_OFF, LED_OFF);
