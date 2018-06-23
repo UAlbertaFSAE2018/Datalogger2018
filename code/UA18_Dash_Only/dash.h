@@ -14,7 +14,7 @@
 #define GEAR_START          14
 #define GEAR_LENGTH         64
 
-#define MAX_RPM     12000
+#define MAX_RPM     10500
 
 //TODO: add color definitions
 
