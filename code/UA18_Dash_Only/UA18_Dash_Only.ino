@@ -2,13 +2,14 @@
 #include "dash.h"
 
 
-#define DEBUG_MODE  true
-#define BAUD_RATE   9600
-#define CAN_RATE    1000E3
-#define DASH_PIN    6
-#define CAN_ID_RPM  0x360 // bytes 0-1
-#define CAN_ID_THR  0x360 // bytes 4-5
-#define CAN_ID_GEAR 0x370 // bytes 2-3
+#define DEBUG_MODE      true
+#define WAIT_FOR_ECU    1000 // ms
+#define BAUD_RATE       9600
+#define CAN_RATE        1000E3
+#define DASH_PIN        6
+#define CAN_ID_RPM      0x360 // bytes 0-1
+#define CAN_ID_THR      0x360 // bytes 4-5
+#define CAN_ID_GEAR     0x370 // bytes 2-3
 
 
 Dash dash = Dash(DASH_PIN);
@@ -27,7 +28,12 @@ void setup() {
           if(DEBUG_MODE) {
               Serial.println("Starting CAN failed!");
           }
-          while (1);
+          dash.clear();
+          dash.setCanErr();
+          dash.show();
+          while(!CAN.begin(CAN_RATE)){
+              delay(WAIT_FOR_ECU);
+          }
     }
     CAN.onReceive(updateCAN);
     if(DEBUG_MODE){

@@ -32,12 +32,14 @@ class Dash {
         void clearTempLight(uint8_t light);
         void setTach(uint16_t rpm);
         void clearTach(void);
+        void setCanErr(void);
         void setGear(uint8_t gear);
         void clearGear(void);
     protected:
         Adafruit_NeoPixel strip;
         uint8_t stripPin;
         uint32_t gearColor;
+        uint32_t errColor;
         uint32_t tempColor;
         uint32_t tachColor[TACH_LENGTH];
 };

@@ -59,10 +59,22 @@ static const bool gearNumbers[6][64] = {{
     0, 1, 1, 1, 1, 1, 1, 0} /* 5 */
 };
 
+static const bool canErr[64] = {
+    1, 1, 0, 1, 0, 1, 0, 1,
+    1, 0, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 0, 1, 1, 0, 1,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    1, 1, 0, 0, 0, 0, 0, 0,
+    1, 1, 0, 1, 1, 0, 1, 1,
+    1, 1, 0, 1, 0, 0, 1, 0
+};
+
 Dash::Dash(uint8_t pin){
     strip = Adafruit_NeoPixel(NUM_PIXELS, pin, NEO_RGB + NEO_KHZ800);
     
     gearColor = strip.Color(LED_ON, LED_OFF, LED_OFF); // gear color is actually in GRB
+    errColor = strip.Color(LED_OFF, LED_ON, LED_OFF); // gear color is actually in GRB
     tempColor = strip.Color(LED_ON, LED_OFF, LED_OFF);
     
     tachColor[0] = strip.Color(LED_OFF, LED_ON, LED_OFF);
@@ -134,6 +146,13 @@ void Dash::setTach(uint16_t rpm){
 void Dash::clearTach(void){
     for(uint8_t i = TACH_START; i < TACH_START + TACH_LENGTH; i++){
         strip.setPixelColor(i, 0);
+    }
+}
+
+void Dash::setCanErr(void){
+    clearGear();
+    for(uint8_t i = GEAR_START; i < GEAR_START + GEAR_LENGTH; i++){
+        strip.setPixelColor(i, errColor * gearNumbers[i - GEAR_START]);
     }
 }
 
