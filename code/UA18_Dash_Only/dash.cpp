@@ -152,7 +152,7 @@ void Dash::clearTach(void){
 void Dash::setCanErr(void){
     clearGear();
     for(uint8_t i = GEAR_START; i < GEAR_START + GEAR_LENGTH; i++){
-        strip.setPixelColor(i, errColor * gearNumbers[i - GEAR_START]);
+        strip.setPixelColor(i, errColor * canErr[i - GEAR_START]);
     }
 }
 
