@@ -25,41 +25,40 @@ float sensorReading1 = 0.00; // value read from your first sensor
 float sensorReading2 = 0.00; // value read from your second sensor
 float sensorReading3 = 0.00; // value read from your third sensor
 File sensorData;
-//
-//
-void setup()
-{
-// Open serial communications
-Serial.begin(9600);
-Serial.print("Initializing SD card...");
-pinMode(CSpin, OUTPUT);
-//
-// see if the card is present and can be initialized:
-if (!SD.begin(CSpin)) {
-Serial.println("Card failed, or not present");
-// don't do anything more:
-return;
+
+
+void setup() {
+    // Open serial communications
+    Serial.begin(9600);
+    Serial.print("Initializing SD card...");
+    pinMode(CSpin, OUTPUT);
+    // see if the card is present and can be initialized:
+    if (!SD.begin(CSpin)) {
+        Serial.println("Card failed, or not present");
+        // don't do anything more:
+        return;
+    }
+    Serial.println("card initialized.");
 }
-Serial.println("card initialized.");
+
+
+void loop() {
+    // build the data string
+    dataString = String(sensorReading1) + "," + String(sensorReading2) + "," + String(sensorReading3); // convert to CSV
+    saveData(); // save to SD card
+    delay(60000); // delay before next write to SD Card, adjust as required
 }
-//
-void loop(){
-// build the data string
-dataString = String(sensorReading1) + "," + String(sensorReading2) + "," + String(sensorReading3); // convert to CSV
-saveData(); // save to SD card
-delay(60000); // delay before next write to SD Card, adjust as required
-}
-//
-void saveData(){
-if(SD.exists("data.csv")){ // check the card is still there
-// now append new data file
-sensorData = SD.open("data.csv", FILE_WRITE);
-if (sensorData){
-sensorData.println(dataString);
-sensorData.close(); // close the file
-}
-}
-else{
-Serial.println("Error writing to file !");
-}
+
+
+void saveData() {
+    if(SD.exists("data.csv")) { // check the card is still there
+        // now append new data file
+        sensorData = SD.open("data.csv", FILE_WRITE);
+        if (sensorData) {
+            sensorData.println(dataString);
+            sensorData.close(); // close the file
+        }
+    } else {
+        Serial.println("Error writing to file !");
+    }
 }

@@ -1,3 +1,6 @@
+// TODO: investigate compatibility with Mega
+
+
 #include <CAN.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
@@ -22,7 +25,6 @@ SensorShield sensorShield = SensorShield();
 Dash dash = Dash(DASH_PIN);
 Adafruit_BNO055 bno = Adafruit_BNO055();
 TinyGPSPlus gps;
-File dataFile;
 
 
 // see Haltech_CAN_Broadcast_Protocol_v2-0.pdf
@@ -34,10 +36,11 @@ uint32_t values[NUM_VALUES] = {};
 int8_t gear = -1;
 uint16_t rpm = 0;
 
-// TODO: finish implementing these
 bool bnoAlive = false;
 bool canAlive = false;
 bool sdAlive = false;
+
+String fileName = "dataset0.csv";
 
 
 void setup() {
@@ -46,12 +49,12 @@ void setup() {
     pinMode(CS_PIN, OUTPUT);
     
     dash.begin();
-    if(DEBUG_MODE){
+    if(DEBUG_MODE) {
         dash.test();
     }
     
     bnoAlive = bno.begin();
-    if(bnoAlive){
+    if(bnoAlive) {
         bno.setExtCrystalUse(true);
     } else if(DEBUG_MODE) {
         Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
@@ -59,14 +62,16 @@ void setup() {
     
     // TODO: make CAN wait for ECU
     canAlive = CAN.begin(CAN_RATE);
-    if(canAlive){
+    if(canAlive) {
         CAN.onReceive(updateCAN);
     } else if (DEBUG_MODE) {
         Serial.println("Starting CAN failed!");
     }
 
     sdAlive = SD.begin(CS_PIN);
-    if(!sdAlive && DEBUG_MODE){
+    if(sdAlive){
+        selectFileName();
+    } else if(DEBUG_MODE) {
         Serial.println("Card failed, or not present");
     }
     
@@ -77,12 +82,16 @@ void setup() {
 
 void loop() {
     updateSensors();
-    updateOrientation();
-    if(!DEBUG_MODE){
+    if(bnoAlive) {
+        updateOrientation();
+    }
+    if(!DEBUG_MODE) {
         updateGPS();
     }
     updateDash();
-    writeSD();
+    if(sdAlive) {
+        writeSD();
+    }
 }
 
 
@@ -142,7 +151,35 @@ void updateDash() {
 }
 
 
+void selectFileName() {
+    uint8_t i = 0;
+    while(SD.exists(fileName)) {
+        fileName = "dataset" + i++;
+    }
+}
+
+
 void writeSD() {
-    
+    File dataFile = SD.open(fileName, FILE_WRITE);
+
+    if(dataFile) {
+        String dataLine = parseData();
+        dataFile.println(dataLine);
+        dataFile.close();
+    } else if(DEBUG_MODE) {
+        Serial.println("error opening file");
+    }
+}
+
+
+String parseData(){
+    String returnString = "";
+    for(int i = 0; i < NUM_VALUES; i++) {
+        returnString += values[i];
+        if(i < NUM_VALUES - 1) { // don't add a comma after the final value
+            returnString += ",";
+        }
+    }
+    return returnString;
 }
 
