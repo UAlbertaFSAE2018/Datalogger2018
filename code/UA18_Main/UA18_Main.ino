@@ -3,6 +3,8 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
+#include <SD.h>
+#include <SPI.h>
 #include <TinyGPS++.h>
 #include "dash.h"
 #include "sensorShield.h"
@@ -14,11 +16,13 @@
 #define NUM_CAN_IDS 23
 #define NUM_VALUES  40
 #define DASH_PIN    6
+#define CS_PIN      10
 
 SensorShield sensorShield = SensorShield();
 Dash dash = Dash(DASH_PIN);
 Adafruit_BNO055 bno = Adafruit_BNO055();
 TinyGPSPlus gps;
+File dataFile;
 
 
 // see Haltech_CAN_Broadcast_Protocol_v2-0.pdf
@@ -30,29 +34,42 @@ uint32_t values[NUM_VALUES] = {};
 int8_t gear = -1;
 uint16_t rpm = 0;
 
+// TODO: finish implementing these
+bool bnoAlive = false;
+bool canAlive = false;
+bool sdAlive = false;
+
 
 void setup() {
     Serial.begin(BAUD_RATE);
+
+    pinMode(CS_PIN, OUTPUT);
+    
     dash.begin();
-    // TODO: make code tolerant to missing sensor
-    if(!bno.begin()) {
-        if(DEBUG_MODE) {
-            Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-        }
-        while(1);
-    }
-    bno.setExtCrystalUse(true);
-    // TODO: make code tolerant to missing CAN
-    if (!CAN.begin(CAN_RATE)) {
-          if(DEBUG_MODE) {
-              Serial.println("Starting CAN failed!");
-          }
-          while (1);
-    }
-    CAN.onReceive(updateCAN);
     if(DEBUG_MODE){
         dash.test();
     }
+    
+    bnoAlive = bno.begin();
+    if(bnoAlive){
+        bno.setExtCrystalUse(true);
+    } else if(DEBUG_MODE) {
+        Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    }
+    
+    // TODO: make CAN wait for ECU
+    canAlive = CAN.begin(CAN_RATE);
+    if(canAlive){
+        CAN.onReceive(updateCAN);
+    } else if (DEBUG_MODE) {
+        Serial.println("Starting CAN failed!");
+    }
+
+    sdAlive = SD.begin(CS_PIN);
+    if(!sdAlive && DEBUG_MODE){
+        Serial.println("Card failed, or not present");
+    }
+    
     dash.clear();
     dash.show();
 }
