@@ -4,7 +4,7 @@
 
 #define DEBUG_MODE      true
 #define WAIT_FOR_ECU    1000 // ms
-#define BAUD_RATE       9600
+#define BAUD_RATE       115200
 #define CAN_RATE        1000E3
 #define DASH_PIN        6
 #define CAN_ID_RPM      0x360 // bytes 0-1
@@ -33,6 +33,9 @@ void setup() {
           dash.show();
           while(!CAN.begin(CAN_RATE)){
               delay(WAIT_FOR_ECU);
+          }
+          if(DEBUG_MODE) {
+              Serial.println("CAN Online!");
           }
     }
     CAN.onReceive(updateCAN);

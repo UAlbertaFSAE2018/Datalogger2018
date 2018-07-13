@@ -5,7 +5,7 @@
 
 #define NUM_PIXELS  78
 #define LED_OFF     0
-#define LED_ON      25 // 0 - 255 brightness
+#define LED_ON      25 // 0 - 255 for brightness
 
 #define COOLANT_TEMP_LIGHT  0
 #define OIL_TEMP_LIGHT      13
