@@ -57,7 +57,7 @@ void setup() {
     if(bnoAlive) {
         bno.setExtCrystalUse(true);
     } else if(DEBUG_MODE) {
-        Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+        Serial.println("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     }
     
     // TODO: make CAN wait for ECU

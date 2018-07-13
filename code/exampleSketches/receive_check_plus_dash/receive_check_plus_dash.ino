@@ -78,10 +78,10 @@ void loop()
         }
         Serial.println();
         if(canId == CAN_ID_RPM){
-            rpm = ((buf[0] << 8) & 0xff00) | (buf[1] & 0x00ff);
+            rpm = (((uint16_t)buf[0] << 8) & 0xff00) | ((uint16_t)buf[1] & 0x00ff);
         }
         if(canId == CAN_ID_GEAR){
-            gear = ((buf[2] << 8) & 0xff00) | (buf[3] & 0x00ff);
+            gear = (((uint16_t)buf[2] << 8) & 0xff00) | ((uint16_t)buf[3] & 0x00ff);
         }
     }
 }
