@@ -16,7 +16,7 @@ void loop() {
     dash.show();
     delay(5000);
     
-    for(int i = 1; i < 5; i++){
+    for(int i = 1; i < 4; i++){
         dash.setGear(i);
         for(int j = 2000; j <= MAX_RPM; j += 100){
             dash.setTach(j);
@@ -27,7 +27,7 @@ void loop() {
     
     delay(500);
     
-    for(int i = 4; i > 0; i--){
+    for(int i = 3; i > 0; i--){
         dash.setGear(i);
         for(int i = MAX_RPM; i >= 2000; i -= 100){
             dash.setTach(i);

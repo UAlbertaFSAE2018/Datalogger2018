@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 #include <Arduino.h>
-#include "sensorShield.h"
+#include "dash.h"
 
 //based on Lightdot 8x8 font
 static const bool gearNumbers[6][64] = {{
@@ -59,10 +59,22 @@ static const bool gearNumbers[6][64] = {{
     0, 1, 1, 1, 1, 1, 1, 0} /* 5 */
 };
 
-SensorShield::SensorShield(uint8_t pin){
-    strip = Adafruit_NeoPixel(NUM_PIXELS, pin, NEO_GRB + NEO_KHZ800);
+static const bool canErr[64] = {
+    1, 1, 0, 1, 0, 1, 0, 1,
+    1, 0, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 0, 1, 1, 0, 1,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    1, 1, 0, 0, 0, 0, 0, 0,
+    1, 1, 0, 1, 1, 0, 1, 1,
+    1, 1, 0, 1, 0, 0, 1, 0
+};
+
+Dash::Dash(uint8_t pin){
+    strip = Adafruit_NeoPixel(NUM_PIXELS, pin, NEO_RGB + NEO_KHZ800);
     
-    gearColor = strip.Color(LED_OFF, LED_OFF, LED_ON);
+    gearColor = strip.Color(LED_ON, LED_OFF, LED_OFF); // gear color is actually in GRB
+    errColor = strip.Color(LED_OFF, LED_ON, LED_OFF); // gear color is actually in GRB
     tempColor = strip.Color(LED_ON, LED_OFF, LED_OFF);
     
     tachColor[0] = strip.Color(LED_OFF, LED_ON, LED_OFF);
@@ -79,15 +91,15 @@ SensorShield::SensorShield(uint8_t pin){
     tachColor[11] = strip.Color(LED_ON, LED_OFF, LED_OFF);
 }
 
-void SensorShield::begin(void){
+void Dash::begin(void){
     strip.begin();
 }
 
-void SensorShield::setBrightness(uint8_t b){
+void Dash::setBrightness(uint8_t b){
     
 }
 
-void SensorShield::test(void){
+void Dash::test(void){
     for(uint8_t i = 0; i < NUM_PIXELS; i++){
         strip.setPixelColor(i, LED_ON, LED_OFF, LED_OFF);
     }
@@ -105,46 +117,53 @@ void SensorShield::test(void){
     delay(1000);
 }
 
-void SensorShield::show(void){
+void Dash::show(void){
     strip.show();
 }
 
-void SensorShield::clear(void){
+void Dash::clear(void){
     strip.clear();
 }
 
-void SensorShield::setTempLight(uint8_t light){
+void Dash::setTempLight(uint8_t light){
     strip.setPixelColor(light, tempColor);
 }
 
-void SensorShield::clearTempLight(uint8_t light){
+void Dash::clearTempLight(uint8_t light){
     strip.setPixelColor(light, 0);
 }
 
-void SensorShield::setTach(uint16_t rpm){
+void Dash::setTach(uint16_t rpm){
     clearTach();
-    for(uint8_t i = TACH_START; i - TACH_START < rpm / (MAX_RPM / (TACH_LENGTH + 1)); i++){
-        if(i >= TACH_START + TACH_LENGTH){
+    for(uint8_t i = 0; i < rpm / (MAX_RPM / (TACH_LENGTH + 1)); i++){
+        if(i >= TACH_LENGTH){
             break;
         }
-        strip.setPixelColor(i, tachColor[i]);
+        strip.setPixelColor(TACH_START + TACH_LENGTH - 1 - i, tachColor[i]);
     }
 }
 
-void SensorShield::clearTach(void){
+void Dash::clearTach(void){
     for(uint8_t i = TACH_START; i < TACH_START + TACH_LENGTH; i++){
         strip.setPixelColor(i, 0);
     }
 }
 
-void SensorShield::setGear(uint8_t gear){
+void Dash::setCanErr(void){
+    clearGear();
+    for(uint8_t i = GEAR_START; i < GEAR_START + GEAR_LENGTH; i++){
+        strip.setPixelColor(i, errColor * canErr[i - GEAR_START]);
+    }
+}
+
+void Dash::setGear(uint8_t gear){
     clearGear();
     for(uint8_t i = GEAR_START; i < GEAR_START + GEAR_LENGTH; i++){
         strip.setPixelColor(i, gearColor * gearNumbers[gear][i - GEAR_START]);
     }
 }
 
-void SensorShield::clearGear(void){
+void Dash::clearGear(void){
     for(uint8_t i = GEAR_START; i < GEAR_START + GEAR_LENGTH; i++){
         strip.setPixelColor(i, 0);
     }

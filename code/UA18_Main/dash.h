@@ -7,18 +7,18 @@
 #define LED_OFF     0
 #define LED_ON      255
 
-#define COOLANT_TEMP_LIGHT  77
-#define OIL_TEMP_LIGHT      78
-#define TACH_START          0
+#define COOLANT_TEMP_LIGHT  0
+#define OIL_TEMP_LIGHT      13
+#define TACH_START          1
 #define TACH_LENGTH         12
-#define GEAR_START          12
+#define GEAR_START          14
 #define GEAR_LENGTH         64
 
 #define MAX_RPM     12000
 
 //TODO: add color definitions
 
-class SensorShield {
+class Dash {
     public:
         Dash(uint8_t pin);
         
