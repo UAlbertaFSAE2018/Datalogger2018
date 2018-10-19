@@ -18,9 +18,6 @@ Adafruit_BNO055 bno = Adafruit_BNO055();
 
 uint32_t values[NUM_VALUES] = {};
 
-int8_t gear = -1;
-uint16_t rpm = 0;
-
 bool bnoAlive = false;
 bool sdAlive = false;
 
