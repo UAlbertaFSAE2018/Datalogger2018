@@ -24,7 +24,7 @@ uint16_t rpm = 0;
 bool bnoAlive = false;
 bool sdAlive = false;
 
-String fileName = "dataset0.csv";
+String fileName = "DATASET0.CSV";
 
 
 void setup() {
@@ -44,6 +44,10 @@ void setup() {
         selectFileName();
     } else if(DEBUG_MODE) {
         Serial.println("Card failed, or not present");
+    }
+
+    if(DEBUG_MODE){
+        Serial.println("Setup Complete");
     }
 }
 
@@ -86,7 +90,10 @@ void updateOrientation() {
 void selectFileName() {
     uint8_t i = 0;
     while(SD.exists(fileName)) {
-        fileName = "dataset" + i++;
+        fileName = String("DATASET") + ++i + ".CSV";
+        if(DEBUG_MODE){
+        Serial.println(fileName);
+    }
     }
 }
 
